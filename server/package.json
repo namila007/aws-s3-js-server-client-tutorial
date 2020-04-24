@@ -1,0 +1,33 @@
+{
+  "name": "aws-s3-js-tutorial",
+  "version": "1.0.0",
+  "description": "AWS S3 server-client tutorial using nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namila007/aws-s3-js-tutorial.git"
+  },
+  "keywords": [
+    "aws",
+    "s3"
+  ],
+  "author": "Namila Bandara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/namila007/aws-s3-js-tutorial/issues"
+  },
+  "homepage": "https://github.com/namila007/aws-s3-js-tutorial#readme",
+  "dependencies": {
+    "aws-sdk": "^2.663.0",
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.3"
+  }
+}
