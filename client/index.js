@@ -11,9 +11,16 @@ const path = require("path")
 const fileName = "team-386673_1920.jpg"
 const filePath = path.resolve(__dirname,fileName)
 const contentType = "image/jpg"
+try {
 
-uploadClient.handleUpload(filePath, contentType).then( res => {
-    console.log("Saving Completed",res)
-}).then(() => {downloadClient.handleDownload("aws-s3-tutorial/"+ fileName)})
-.catch(error => console.log(error))
-
+    uploadClient.handleUpload(filePath, contentType)
+    .then( res => {
+        console.log("Saving Completed",res)})
+    .then(() => { return downloadClient.handleDownload("aws-s3-tutorial/"+ fileName)})
+    .then((res) => console.log(res))
+    .finally(()=> console.log("MISSION ACCOMPLISH :-)"))
+    .catch(error => console.log(error.message))
+    }
+    catch(error) {
+        console.log(error)
+    }

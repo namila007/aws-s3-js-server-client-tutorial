@@ -21,8 +21,9 @@ async function handleDownload (key) {
         const fileName = arr[arr.length-1]
         const savePath = path.join(__dirname,"..","downloads", fileName)
 
-        let signedDLObject = await getDownloadURLObject(key)
-        return Promise.resolve(downloadFiles(signedDLObject.url,savePath))
+        const signedDLObject = await getDownloadURLObject(key)
+        const res = await downloadFiles(signedDLObject.url,savePath)
+        return Promise.resolve(res)
          
     }
     catch (error) {
@@ -45,7 +46,7 @@ function downloadFiles (downloadUrl, filePath) {
         })
         .then(function (res) {
             res.data.pipe(fs.createWriteStream(filePath))
-            console.log("Downloaded")
+            console.log("Download Completed")
             return true
         })
         .catch(e => {
@@ -57,17 +58,17 @@ function downloadFiles (downloadUrl, filePath) {
  *
  * @param {*} key object key
  */
-async function getDownloadURLObject (key) {
+function getDownloadURLObject (key) {
         let encodedKey = encodeURI(key)
         return axios.get(`http://localhost:3030/api/item/?KEY=${encodedKey}`)
             .then(respond => {
                 if (respond.status === 202) {
                     return respond.data
                 } else {
-                    throw new Error(` Error Occured ${respond.data}`)
+                    throw new Error(` Error Occured ${respond.data.error}`)
                 }
             }).catch(e => {
-                handleErrors(e.response.data)
+                handleErrors(e.response.data || e.message || e)
             })
 }
 
@@ -78,7 +79,7 @@ async function getDownloadURLObject (key) {
  * @param {*} e error
  */
 function handleErrors (e) {
-    throw new Error (e.message || e )
+    throw new Error (e.message || e.error ||  e )
 }
 
 module.exports = {
