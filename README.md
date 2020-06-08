@@ -6,8 +6,9 @@ Tutorial >> https://namila.me/blog/2020-06/server-client-app-to-upload-and-downl
 ## RUN Server
 copy the content of `.env.example` to file `.env` and replace AWS keys, region and other configurations
 
-``
-cd server``
+``cd server``
+
+`` npm install``
 
 ``
 npm run start
@@ -15,6 +16,8 @@ npm run start
 ## RUN Client
 ``
 cd client``
+
+`` npm install``
 
 ``
 node index.js
