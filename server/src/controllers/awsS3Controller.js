@@ -1,10 +1,22 @@
+/*
+ * Created on Mon Jun 08 2020
+ * Authored by Namila Bandara
+ * Copyright (c) 2020
+ * https://github.com/namila007/aws-s3-js-tutorial
+ */
 const s3 = require("../services/awsS3")
 const config = require("../config/config")
 const httpStatus = require('http-status-codes');
 
 const expireTime = 60 * 60 //1Hour 
 
-const presignedUploadurl = async (req, res, next) => {
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+const putObject = async (req, res, next) => {
     try {
         const fileObject = req.body
         if(!fileObject || !fileObject.hasOwnProperty('name') || !fileObject.hasOwnProperty('contentMD5') || !fileObject.hasOwnProperty('contentType')) 
@@ -20,10 +32,10 @@ const presignedUploadurl = async (req, res, next) => {
             ACL: "public-read",
             Expires: expireTime
         }
-        const sigendUrl = await s3.getSignedUrlPromise('putObject', params)
+        const signedUrl = await s3.getSignedUrlPromise('putObject', params)
         let respond = {
             key: key,
-            url: sigendUrl,
+            url: signedUrl,
             expires: expireTime
         }
         res.status(httpStatus.OK).json(respond)
@@ -31,18 +43,22 @@ const presignedUploadurl = async (req, res, next) => {
         next(error)
     }
 }
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const getObjectList = (req, res, next) => {
     let params = {
         Bucket: config.aws.bucket, /* required */
         Prefix: config.aws.basicPath,
-        MaxKeys: 5
+        MaxKeys: 10
     }
-    if(req.query.ContinuationToken) params.ContinuationToken = req.query.ContinuationToken
+    if(req.query.ContinuationToken) params.ContinuationToken = decodeURI(req.query.ContinuationToken)
     s3.listObjectsV2(params, (err, data) => {
         if(err) {
-            console.error(err)
-            next(error)
+            next(err)
         }
         let response = {
             IsTruncated: data.IsTruncated,
@@ -55,8 +71,13 @@ const getObjectList = (req, res, next) => {
       })
 }
 
-
-const getItemByKey = async (req, res, next) => {
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+const getObjectByKey = async (req, res, next) => {
 
     let key = decodeURI(req.query.KEY)
     // testing if the key contains basic 
@@ -73,8 +94,13 @@ const getItemByKey = async (req, res, next) => {
             Expires: expireTime
         }
     
-        const url= await s3.getSignedUrlPromise('getObject', params)
-        res.status(httpStatus.ACCEPTED).json({"url": url})
+        const signedUrl= await s3.getSignedUrlPromise('getObject', params)
+        let respond = {
+            key: key,
+            url: signedUrl,
+            expires: expireTime
+        }
+        res.status(httpStatus.ACCEPTED).json(respond)
     }
     catch (error){
         next(error)
@@ -82,7 +108,7 @@ const getItemByKey = async (req, res, next) => {
 }
 
 module.exports = {
-    presignedUploadurl: presignedUploadurl,
+    putObject: putObject,
     getObjectList: getObjectList,
-    getItemByKey: getItemByKey
+    getObjectByKey: getObjectByKey
 }
